@@ -1,0 +1,622 @@
+{% extends 'base.html' %}
+{% load form_filters %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+  <!-- Main Form Section -->
+  <div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-11">
+      <div class="form-card position-relative">
+        <!-- Decorative Elements -->
+        <div class="card-decoration card-decoration-1"></div>
+        <div class="card-decoration card-decoration-2"></div>
+
+        <div class="card border-0 shadow-xl rounded-4 overflow-hidden">
+          <!-- Enhanced Header -->
+          <div class="card-header border-0 position-relative">
+            <div class="header-gradient"></div>
+            <div class="position-relative p-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h4 class="mb-1 text-white fw-semibold">
+                    <i class="bi bi-pencil-square me-2"></i>
+                    เพิ่มข้อมูลการอบรม
+                  </h4>
+                  <p class="mb-0 text-white-50 small">
+                    กรอกข้อมูลและแนบไฟล์วุฒิบัตรเพื่อเก็บบันทึกการอบรม
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Body -->
+          <div class="card-body p-5">
+            <form method="post" enctype="multipart/form-data" novalidate class="needs-validation">
+              {% csrf_token %}
+
+              <!-- Progress Indicator -->
+              <div class="progress-indicator mb-5">
+                <div class="progress-step active">
+                  <div class="step-number">1</div>
+                  <div class="step-label">ข้อมูลพื้นฐาน</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                  <div class="step-number">2</div>
+                  <div class="step-label">รายละเอียด</div>
+                </div>
+                <div class="progress-line"></div>
+                <div class="progress-step">
+                  <div class="step-number">3</div>
+                  <div class="step-label">ไฟล์แนบ</div>
+                </div>
+              </div>
+
+              <!-- Form Fields -->
+              <div class="form-sections">
+                <div class="row">
+                  {% for field in form %}
+                  <div
+                    class="form-group-enhanced mb-4 {% if field.label == 'course_name' %}col-lg-12{% elif field.label == 'ประเภทการอบรม' %}col-lg-5{% else %}col-12{% endif %}">
+                    <div class="field-container position-relative">
+
+                      <!-- Field Label -->
+                      <label for="{{ field.id_for_label }}" class="form-label-modern position-relative">
+                        <div class="label-content">
+                          <i class="bi bi-chevron-right text-primary me-2"></i>
+                          <span class="label-text fw-semibold">{{ field.label }}</span>
+                          {% if field.field.required %}
+                          <span class="text-danger ms-1">*</span>
+                          {% endif %}
+                        </div>
+                      </label>
+
+                      <!-- Field Input -->
+                      <div class="input-wrapper position-relative">
+                        {% if field.field.widget.input_type == "select" %}
+                        <div class="select-wrapper">
+                          {{ field|add_class:"form-control-modern w-50" }}
+
+                        </div>
+                        {% elif field.field.widget.input_type == "file" %}
+                        <div class="file-upload-wrapper">
+                          <div class="file-upload-area">
+                            {{ field|add_class:"form-control-modern file-input" }}
+                            <div class="file-upload-placeholder">
+                              <i class="bi bi-cloud-upload display-6 text-muted mb-2"></i>
+                              <p class="mb-1 text-muted">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</p>
+                              <small class="text-muted">รองรับไฟล์: PDF, JPG, PNG (สูงสุด 5MB)</small>
+                            </div>
+                          </div>
+                        </div>
+                        {% elif field.field.widget.input_type == "textarea" %}
+                          <div class="textarea-wrapper w-100">
+                            {{ field|add_class:"form-control-modern textarea-auto-resize" }}
+                            <div class="textarea-counter">
+                              <span class="current-count">0</span>/<span class="max-count">500</span>
+                            </div>
+                          </div>
+                        {% else %}
+                        <div class="input-group-modern">
+                          {{ field|add_class:"form-control-modern" }}
+                          <div class="input-focus-line"></div>
+                        </div>
+                        {% endif %}
+                      </div>
+
+                      <!-- Help Text -->
+                      {% if field.help_text %}
+                      <div class="help-text">
+                        <i class="bi bi-info-circle me-1"></i>
+                        {{ field.help_text }}
+                      </div>
+                      {% endif %}
+
+                      <!-- Error Messages -->
+                      {% if field.errors %}
+                      <div class="error-message animate-shake">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <span>{{ field.errors.as_text|linebreaksbr }}</span>
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="form-actions mt-5">
+                <div class="row g-3">
+                  <div class="col-lg-6">
+                    <a href="{% url 'training_list' %}" class="btn btn-outline-secondary btn-lg w-100 btn-modern">
+                      <i class="bi bi-arrow-left-circle me-2"></i>
+                      ย้อนกลับ
+                    </a>
+                  </div>
+                  <div class="col-lg-6">
+                    <button type="submit" class="btn btn-primary btn-lg w-100 btn-modern btn-submit">
+                      <span class="btn-text">
+                        <i class="bi bi-save2 me-2"></i>
+                        บันทึกข้อมูล
+                      </span>
+                      <div class="btn-loader">
+                        <div class="spinner-border spinner-border-sm me-2" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                        </div>
+                        กำลังบันทึก...
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --shadow-primary: 0 10px 40px rgba(102, 126, 234, 0.3);
+    --shadow-secondary: 0 5px 20px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Form Card */
+  .form-card {
+    margin-top: 0;
+  }
+
+  .card-decoration {
+    position: absolute;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    opacity: 0.1;
+    z-index: 0;
+  }
+
+  .card-decoration-1 {
+    width: 200px;
+    height: 200px;
+    top: -100px;
+    right: -100px;
+  }
+
+  .card-decoration-2 {
+    width: 150px;
+    height: 150px;
+    bottom: -75px;
+    left: -75px;
+  }
+
+  .card {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Header Gradient */
+  .header-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--primary-gradient);
+  }
+
+  /* Progress Indicator */
+  .progress-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  .progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 8px;
+    transition: var(--transition);
+  }
+
+  .progress-step.active .step-number {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-primary);
+  }
+
+  .step-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .progress-line {
+    width: 100px;
+    height: 2px;
+    background: #e9ecef;
+    margin: 0 20px;
+    position: relative;
+    top: -16px;
+  }
+
+  /* Form Fields */
+  .form-group-enhanced {
+    position: relative;
+  }
+
+  .form-label-modern {
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .label-content {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    color: #2c3e50;
+  }
+
+  .form-control-modern {
+    border: 2px solid #e9ecef;
+    border-radius: var(--border-radius);
+    padding: 12px 16px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .form-control-modern:focus {
+    border-color: #667eea;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .input-group-modern {
+    position: relative;
+  }
+
+  .input-focus-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: var(--transition);
+  }
+
+  .form-control-modern:focus+.input-focus-line {
+    width: 100%;
+  }
+
+  /* Select Wrapper */
+  .select-wrapper {
+    position: relative;
+  }
+
+  .select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+  }
+
+  /* File Upload */
+  .file-upload-wrapper {
+    position: relative;
+  }
+
+  .file-upload-area {
+    border: 2px dashed #d1ecf1;
+    border-radius: var(--border-radius);
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8f9fa;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .file-upload-area:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .file-upload-placeholder {
+    pointer-events: none;
+  }
+
+  /* Textarea */
+  .textarea-wrapper {
+    position: relative;
+  }
+
+  .textarea-auto-resize {
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .textarea-counter {
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 0.75rem;
+    color: #6c757d;
+  }
+
+  /* Help Text */
+  .help-text {
+    margin-top: 6px;
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Error Messages */
+  .error-message {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 6px;
+    color: #c33;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  @keyframes shake {
+
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+
+    25% {
+      transform: translateX(-5px);
+    }
+
+    75% {
+      transform: translateX(5px);
+    }
+  }
+
+  /* Buttons */
+  .btn-modern {
+    border-radius: var(--border-radius);
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-secondary);
+  }
+
+  .btn-submit {
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    position: relative;
+  }
+
+  .btn-submit:hover {
+    background: var(--primary-gradient);
+    box-shadow: var(--shadow-primary);
+  }
+
+  .btn-loader {
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-submit.loading .btn-text {
+    display: none;
+  }
+
+  .btn-submit.loading .btn-loader {
+    display: flex;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .progress-indicator {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .progress-line {
+      width: 2px;
+      height: 30px;
+      margin: 0;
+      top: 0;
+    }
+
+    .card-body {
+      padding: 2rem 1rem !important;
+    }
+  }
+
+  /* Animation for form load */
+  .form-group-enhanced {
+    animation: slideInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .form-group-enhanced:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  .form-group-enhanced:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .form-group-enhanced:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  .form-group-enhanced:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  .form-group-enhanced:nth-child(5) {
+    animation-delay: 0.5s;
+  }
+
+  textarea.form-control-modern {
+    width: 100% !important;
+    display: block;
+}
+
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<!-- JavaScript for Enhanced Functionality -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Form submission loading state
+    const submitBtn = document.querySelector('.btn-submit');
+    const form = document.querySelector('form');
+
+    if (form && submitBtn) {
+      form.addEventListener('submit', function () {
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+      });
+    }
+
+    // Textarea auto-resize and character counter
+    const textareas = document.querySelectorAll('.textarea-auto-resize');
+    textareas.forEach(textarea => {
+      const counter = textarea.closest('.textarea-wrapper').querySelector('.current-count');
+
+      if (counter) {
+        textarea.addEventListener('input', function () {
+          counter.textContent = this.value.length;
+
+          // Auto-resize
+          this.style.height = 'auto';
+          this.style.height = (this.scrollHeight) + 'px';
+        });
+      }
+    });
+
+    // File upload visual feedback
+    const fileInputs = document.querySelectorAll('.file-input');
+    fileInputs.forEach(input => {
+      const uploadArea = input.closest('.file-upload-area');
+      const placeholder = uploadArea.querySelector('.file-upload-placeholder');
+
+      input.addEventListener('change', function () {
+        if (this.files && this.files.length > 0) {
+          const fileName = this.files[0].name;
+          placeholder.innerHTML = `
+          <i class="bi bi-check-circle-fill display-6 text-success mb-2"></i>
+          <p class="mb-1 text-success">ไฟล์ที่เลือก: ${fileName}</p>
+          <small class="text-muted">คลิกเพื่อเปลี่ยนไฟล์</small>
+        `;
+          uploadArea.style.borderColor = '#28a745';
+          uploadArea.style.backgroundColor = '#f8fff8';
+        }
+      });
+
+      // Drag and drop functionality
+      uploadArea.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        this.style.borderColor = '#667eea';
+        this.style.backgroundColor = '#f0f4ff';
+      });
+
+      uploadArea.addEventListener('dragleave', function () {
+        this.style.borderColor = '#d1ecf1';
+        this.style.backgroundColor = '#f8f9fa';
+      });
+
+      uploadArea.addEventListener('drop', function (e) {
+        e.preventDefault();
+        this.style.borderColor = '#d1ecf1';
+        this.style.backgroundColor = '#f8f9fa';
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          input.files = files;
+          input.dispatchEvent(new Event('change'));
+        }
+      });
+    });
+
+    // Form validation visual feedback
+    const inputs = document.querySelectorAll('.form-control-modern');
+    inputs.forEach(input => {
+      input.addEventListener('blur', function () {
+        if (this.value.trim() !== '') {
+          this.classList.add('is-valid');
+          this.classList.remove('is-invalid');
+        }
+      });
+
+      input.addEventListener('focus', function () {
+        this.classList.remove('is-invalid');
+      });
+    });
+  });
+</script>
+{% endblock %}

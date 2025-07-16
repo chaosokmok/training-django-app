@@ -1,0 +1,648 @@
+{% extends 'base.html' %}
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        .dashboard-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 0;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .dashboard-header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-title {
+            font-size: 1.4rem;  /* ลดจาก 2.2rem */
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        }
+
+        .dashboard-subtitle {
+            font-size: 0.875rem;  /* ลดจาก 1rem */
+            opacity: 0.85;
+            margin-top: 0.4rem;
+            font-weight: 400;
+        }
+
+        .btn-refresh {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            font-size: 1.2rem;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(180deg) scale(1.1);
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-content {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .status-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .status-completed {
+            color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .status-incomplete {
+            color: #f59e0b;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .status-hours {
+            font-size: 1.1rem;  /* ลดจาก 1.8rem */
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.4rem;
+        }
+
+        .status-label {
+            font-size: 1rem;  /* ลดจาก 1rem */
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .chart-header {
+            padding: 1.2rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+        }
+
+        .chart-header i {
+            font-size: 1.1rem;
+        }
+
+        .chart-header-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .chart-header-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .chart-header-warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .chart-header-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .chart-body {
+            padding: 1.5rem;
+        }
+
+        .mini-chart-container {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+        }
+
+        .progress-ring-bg {
+            fill: none;
+            stroke: #e5e7eb;
+            stroke-width: 8;
+        }
+
+        .progress-ring-fill {
+            fill: none;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transform-origin: center;
+            transform: rotate(-90deg);
+            transition: stroke-dashoffset 1s ease-in-out;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .chart-animation {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        .status-completed .sparkle {
+            background: #10b981;
+        }
+
+        .status-incomplete .sparkle {
+            background: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element" style="top: 10%; left: 10%; width: 60px; height: 60px; animation-delay: 0s;"></div>
+        <div class="floating-element" style="top: 20%; right: 10%; width: 40px; height: 40px; animation-delay: 2s;"></div>
+        <div class="floating-element" style="bottom: 20%; left: 20%; width: 80px; height: 80px; animation-delay: 4s;"></div>
+        <div class="floating-element" style="bottom: 10%; right: 20%; width: 50px; height: 50px; animation-delay: 6s;"></div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <div class="dashboard-header-content">
+                    <div>
+                        <h1 class="dashboard-title">
+                            <i class="bi bi-speedometer2 me-3"></i>แดชบอร์ดข้อมูลการอบรม
+                        </h1>
+                        <p class="dashboard-subtitle">ข้อมูลภาพรวมสถานะและกราฟจำนวนชั่วโมงการอบรมทั้งหมด</p>
+                    </div>
+                    <button class="btn-refresh" onclick="window.location.href='{% url 'training_dashboard' %}'">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- Status Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="status-card">
+                            {% if total_hours >= 60 %}
+                                <div class="status-icon status-completed">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-success">ชั่วโมงรวม</p>
+                                <div class="status-hours">{{ total_hours }} ชม.</div>
+                                <p class="status-label text-success">ครบแล้ว</p>
+                            {% else %}
+                                <div class="status-icon status-incomplete">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-warning">ชั่วโมงรวม</p>
+                                <div class="status-hours">{{ total_hours }} ชม.</div>
+                                <p class="status-label text-warning">ยังไม่ครบ</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="status-card">
+                            {% if digital_hours >= 20 %}
+                                <div class="status-icon status-completed">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-success">ทักษะดิจิทัล</p>
+                                <div class="status-hours">{{ digital_hours }} ชม.</div>
+                                <p class="status-label text-success">ครบแล้ว</p>
+                            {% else %}
+                                <div class="status-icon status-incomplete">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-warning">ทักษะดิจิทัล</p>
+                                <div class="status-hours">{{ digital_hours }} ชม.</div>
+                                <p class="status-label text-warning">ยังไม่ครบ</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="status-card">
+                            {% if risk_hours >= 1 %}
+                                <div class="status-icon status-completed">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-success">การบริหารความเสี่ยง</p>
+                                <div class="status-hours">{{ risk_hours }} ชม.</div>
+                                <p class="status-label text-success">ครบแล้ว</p>
+                            {% else %}
+                                <div class="status-icon status-incomplete">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <div class="sparkle" style="top: 20%; right: 25%;"></div>
+                                    <div class="sparkle" style="bottom: 20%; left: 25%; animation-delay: 1s;"></div>
+                                </div>
+                                <p class="status-label text-warning">การบริหารความเสี่ยง</p>
+                                <div class="status-hours">{{ risk_hours }} ชม.</div>
+                                <p class="status-label text-warning">ยังไม่ครบ</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="chart-card chart-animation">
+                            <div class="chart-header chart-header-primary">
+                                <i class="bi bi-pie-chart-fill"></i>
+                                จำนวนชั่วโมงที่อบรมแล้วทั้งหมด ({{ total_hours }} ชม.)
+                            </div>
+                            <div class="chart-body" style="height: 400px;">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="row g-3 h-100">
+                            <div class="col-12">
+                                <div class="chart-card chart-animation" style="animation-delay: 0.2s;">
+                                    <div class="chart-header chart-header-success">
+                                        <i class="bi bi-cpu-fill"></i>
+                                        ด้านทักษะดิจิทัล ({{ digital_hours }} ชม.)
+                                    </div>
+                                    <div class="chart-body mini-chart-container">
+                                        <canvas id="digitalChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="chart-card chart-animation" style="animation-delay: 0.4s;">
+                                    <div class="chart-header chart-header-warning">
+                                        <i class="bi bi-person-check-fill"></i>
+                                        ด้านสมรรถนะและมาตรฐาน ({{ position_hours }} ชม.)
+                                    </div>
+                                    <div class="chart-body mini-chart-container">
+                                        <canvas id="positionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="chart-card chart-animation" style="animation-delay: 0.6s;">
+                                    <div class="chart-header chart-header-danger">
+                                        <i class="bi bi-shield-exclamation"></i>
+                                        ด้านการบริหารความเสี่ยง ({{ risk_hours }} ชม.)
+                                    </div>
+                                    <div class="chart-body mini-chart-container">
+                                        <canvas id="riskChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <script>
+        // Data from Django template
+    const pieData = {{ chart_data|safe }};
+
+    // คำค้นที่อาจจะส่งมาจาก Django
+    const colorMap = {
+        'digital': '#10b981',
+        'ดิจิทัล': '#10b981',
+        'ทักษะดิจิทัล': '#10b981',
+
+        'position': '#f59e0b',
+        'สมรรถนะ': '#f59e0b',
+        'มาตรฐาน': '#f59e0b',
+        'สมรรถนะและมาตรฐาน': '#f59e0b',
+
+        'risk': '#ef4444',
+        'ความเสี่ยง': '#ef4444',
+        'การบริหารความเสี่ยง': '#ef4444'
+    };
+
+    function matchColor(label) {
+        const lowerLabel = label.toLowerCase();
+        for (const key in colorMap) {
+            if (lowerLabel.includes(key)) {
+                return colorMap[key];
+            }
+        }
+        return '#999'; // fallback สีเทา (ถ้าไม่มีตรงไหน match เลย)
+    }
+
+    const pieLabels = Object.keys(pieData);
+    const pieValues = Object.values(pieData);
+
+    new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels: pieLabels,
+            datasets: [{
+                data: pieValues,
+                backgroundColor: pieLabels.map(matchColor),
+                borderColor: pieLabels.map(matchColor),
+                borderWidth: 3,
+                hoverBorderWidth: 5,
+                hoverBorderColor: '#fff'
+            }]
+        },
+        options: {
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 14, weight: '600' },
+                        color: '#374151',
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold', size: 16 },
+                    formatter: (value) => value > 0 ? value + ' ชม.' : '',
+                    textStrokeColor: 'rgba(0,0,0,0.3)',
+                    textStrokeWidth: 1
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 2000,
+                easing: 'easeOutBounce'
+            },
+            responsive: true,
+            maintainAspectRatio: false
+        },
+        plugins: [ChartDataLabels]
+    });
+    
+
+        // Enhanced horizontal bar chart function
+        function renderHorizontalBar(id, label, value, color, maxValue = 100) {
+            const gradient = document.getElementById(id).getContext('2d').createLinearGradient(0, 0, 400, 0);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, color + '80');
+
+            new Chart(document.getElementById(id), {
+                type: 'bar',
+                data: {
+                    labels: [label],
+                    datasets: [{
+                        data: [value],
+                        backgroundColor: gradient,
+                        borderColor: color,
+                        borderWidth: 2,
+                        borderRadius: 15,
+                        borderSkipped: false,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutBounce'
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'right',
+                            color: '#1f2937',
+                            font: { weight: 'bold', size: 16 },
+                            formatter: (val) => val + ' ชั่วโมง',
+                            offset: 10
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: maxValue,
+                            ticks: { 
+                                stepSize: 10, 
+                                color: '#6b7280', 
+                                font: { size: 12 }
+                            },
+                            grid: { 
+                                color: 'rgba(107, 114, 128, 0.1)',
+                                drawBorder: false
+                            }
+                        },
+                        y: {
+                            ticks: { 
+                                color: '#374151', 
+                                font: { size: 14, weight: '600' }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        // Render mini charts with Django data
+        setTimeout(() => {
+            renderHorizontalBar('digitalChart', 'ทักษะดิจิทัล', {{ digital_hours }}, '#10b981');
+        }, 500);
+
+        setTimeout(() => {
+            renderHorizontalBar('positionChart', 'สมรรถนะและมาตรฐาน', {{ position_hours }}, '#f59e0b');
+        }, 1000);
+
+        setTimeout(() => {
+            renderHorizontalBar('riskChart', 'การบริหารความเสี่ยง', {{ risk_hours }}, '#ef4444');
+        }, 1500);
+
+        // Add sparkle animation to status cards
+        function addSparkles() {
+            const statusCards = document.querySelectorAll('.status-card');
+            statusCards.forEach(card => {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.top = Math.random() * 80 + '%';
+                sparkle.style.left = Math.random() * 80 + '%';
+                sparkle.style.animationDelay = Math.random() * 2 + 's';
+                card.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 2000);
+            });
+        }
+
+        // Add sparkles every 3 seconds
+        setInterval(addSparkles, 3000);
+    </script>
+{% endblock %}

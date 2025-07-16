@@ -1,0 +1,546 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>ระบบจัดเก็บการอบรม - IDP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      font-family: 'Noto Sans Thai', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/><stop offset="100%" style="stop-color:rgba(255,255,255,0)"/></radialGradient></defs><circle cx="200" cy="200" r="100" fill="url(%23a)"/><circle cx="600" cy="400" r="150" fill="url(%23a)"/><circle cx="800" cy="700" r="120" fill="url(%23a)"/></svg>') repeat;
+      z-index: -1;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+
+    /* Glass Morphism Effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    }
+
+    /* Enhanced Navbar */
+    .custom-navbar {
+      background: rgba(30, 61, 89, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .custom-navbar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .navbar-brand {
+      font-weight: 700;
+      color: #ffffff !important;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .navbar-brand:hover {
+      transform: scale(1.05);
+      color: #a8d8ff !important;
+    }
+
+    .navbar-brand img {
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover img {
+      transform: rotate(5deg) scale(1.1);
+    }
+
+    .nav-link {
+      color: #d1e9ff !important;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 12px 20px !important;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-link:hover::before {
+      left: 100%;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #ffffff !important;
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-link i {
+      margin-right: 8px;
+      font-size: 1.1em;
+    }
+
+    /* Enhanced Buttons */
+    .btn-outline-light {
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-weight: 500;
+      padding: 8px 20px;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-outline-light::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn-outline-light:hover::before {
+      left: 100%;
+    }
+
+    .btn-outline-light:hover {
+      background: #ffffff;
+      color: #1e3d59;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Main Content Enhancement */
+    main {
+      flex: 1;
+      padding: 40px 0;
+    }
+
+    .content-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      animation: shimmer 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Enhanced Footer */
+    footer {
+      background: rgba(30, 61, 89, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      color: #d1e9ff;
+      padding: 30px 0;
+      margin-top: auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #667eea, #764ba2, transparent);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { opacity: 0.5; }
+      to { opacity: 1; }
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .footer-content i {
+      font-size: 1.2em;
+      color: #a8d8ff;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+      
+      .content-card {
+        padding: 20px;
+        margin: 10px 0;
+      }
+      
+      .nav-link {
+        padding: 10px 15px !important;
+      }
+    }
+
+    /* Loading Animation */
+    .loading-spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      display: none;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(255, 255, 255, 0.3);
+      border-top: 5px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Hover Effects for Interactive Elements */
+    .interactive-element {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .interactive-element:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    /* Text Enhancements */
+    .text-glow {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: #d1e9ff;
+      margin-bottom: 30px;
+    }
+
+    /* Card Hover Effects */
+    .feature-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 20px 0;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      color: #a8d8ff;
+      margin-bottom: 20px;
+    }
+
+    /* Navigation Improvements */
+    .navbar-toggler {
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .navbar-toggler:focus {
+      box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" id="loadingSpinner">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Enhanced Navbar -->
+  <nav class="navbar navbar-expand-lg custom-navbar shadow-lg">
+    <div class="container">
+      <!-- Logo + System Name -->
+      <a class="navbar-brand interactive-element" href="#" onclick="showLoading()">
+        <div>
+          <img src="{% static 'trainings/logo-court.png' %}" alt="Court Logo" width="40" height="55" class="me-2">
+        </div>
+        <span class="text-glow">ระบบจัดเก็บข้อมูลการอบรม ( IDP )</span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item px-2">
+            <a class="nav-link active" href="{% url 'training_list' %}" onclick="showLoading()">
+              <i class="bi bi-journal-text"></i> รายการอบรม
+            </a>
+          </li>
+          <li class="nav-item px-2">
+            <a class="nav-link" href="{% url 'training_create' %}" onclick="showLoading()">
+              <i class="bi bi-plus-square"></i> เพิ่มอบรม
+            </a>
+          </li>
+          <li class="nav-item px-2">
+            <a class="nav-link" href="{% url 'training_dashboard' %}" onclick="showLoading()">
+              <i class="bi bi-bar-chart-line"></i> แดชบอร์ด
+            </a>
+          </li>
+        </ul>
+
+        <!-- User Info + Buttons -->
+        <div class="d-flex align-items-center ms-3">
+          <span class="text-light me-3 small">
+            {% if user.is_authenticated %}
+            <span class="text-light me-2 small"><i class="bi bi-person-circle"></i> {{ user.username }}</span>
+            <form method="post" action="{% url 'logout' %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-light btn-sm">
+                <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
+              </button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-box-arrow-in-left"></i> เข้าสู่ระบบ
+            </a>
+            {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🔸 Main Content -->
+  <main class="flex-grow-1 py-4">
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <!-- Enhanced Footer -->
+  <footer class="text-center">
+    <div class="container">
+      <div class="footer-content">
+        <i class="bi bi-c-circle"></i>
+        <strong>2025</strong>
+        <span>อุ อิ อา อุ๊ อิ อา อุ๊ เอะ อุ อิ อา เอะ โอะ อิ อ๊า อุ อะ อ๊ะ อิ อ๊า อิ โอ อุ อา</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    // Loading Animation
+    function showLoading() {
+      const spinner = document.getElementById('loadingSpinner');
+      spinner.style.display = 'block';
+      setTimeout(() => {
+        spinner.style.display = 'none';
+      }, 1500);
+    }
+
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Add floating animation to cards
+    const cards = document.querySelectorAll('.feature-card, .glass');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+      card.style.animation = 'float 3s ease-in-out infinite';
+    });
+
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const navbar = document.querySelector('.custom-navbar');
+      if (window.scrollY > 50) {
+        navbar.style.background = 'rgba(30, 61, 89, 0.98)';
+        navbar.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+      } else {
+        navbar.style.background = 'rgba(30, 61, 89, 0.95)';
+        navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+      }
+    });
+
+    // Add click ripple effect
+    function createRipple(event) {
+      const button = event.currentTarget;
+      const circle = document.createElement('span');
+      const diameter = Math.max(button.clientWidth, button.clientHeight);
+      const radius = diameter / 2;
+
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+      circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+      circle.classList.add('ripple');
+
+      const ripple = button.getElementsByClassName('ripple')[0];
+      if (ripple) {
+        ripple.remove();
+      }
+
+      button.appendChild(circle);
+    }
+
+    const buttons = document.querySelectorAll('.btn, .nav-link');
+    buttons.forEach(button => {
+      button.addEventListener('click', createRipple);
+    });
+
+    // Add ripple CSS
+    const style = document.createElement('style');
+    style.textContent = `
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+      }
+
+      @keyframes ripple-animation {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add entrance animation
+      const elements = document.querySelectorAll('.content-card, .glass, .feature-card');
+      elements.forEach((element, index) => {
+        element.style.opacity = '0';
+        element.style.transform = 'translateY(30px)';
+        element.style.transition = 'all 0.6s ease';
+        
+        setTimeout(() => {
+          element.style.opacity = '1';
+          element.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+    });
+  </script>
+</body>
+</html>
