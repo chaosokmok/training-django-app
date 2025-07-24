@@ -3,7 +3,6 @@ from . import views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LogoutView
-from .views import *
 
 urlpatterns = [
     path('', views.training_list, name='training_list'),
@@ -12,10 +11,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(template_name='trainings/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('trainings/pdf-preview/', views.preview_pdf, name='preview_pdf'),
+    path('trainings/<int:pk>/', views.training_delete, name='training_delete'),
     path('training/delete/<int:pk>/', views.training_delete, name='training_delete'),
-    path('training/edit/<int:pk>/', views.training_edit, name='training_edit'),
-    
-
-
     
 ]

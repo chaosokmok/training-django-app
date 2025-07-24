@@ -14,6 +14,14 @@ from xhtml2pdf import pisa
 from .models import Training
 from .forms import TrainingForm
 from django.db.models import Sum
+from django.contrib.auth.models import User
+from .models import Profile 
+from .forms import RegistrationForm
+from .models import *
+from .forms import *
+from django.contrib.auth import authenticate, login
+
+
 
 
 @login_required
@@ -37,12 +45,29 @@ def training_list(request):
         except ValueError:
             pass
 
+    # เดือนภาษาไทยแบบย่อ
+    months_th = [
+        "", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+        "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+    ]
+
+    # แปลงวันที่เป็น "วัน เดือน(ย่อ) ปี พ.ศ." และผูกเป็น attribute ใหม่ชื่อ thai_date
+    for t in trainings:
+        if t.date:
+            day = t.date.day
+            month = months_th[t.date.month]
+            year = t.date.year + 543  # แปลงปี ค.ศ. -> พ.ศ.
+            t.thai_date = f"{day} {month} {year}"
+        else:
+            t.thai_date = ""
+
     types = [t[0] for t in Training.COURSE_TYPES]
 
     return render(request, 'trainings/training_list.html', {
         'trainings': trainings,
-        'types': types
+        'types': types,
     })
+
 
 
 @login_required
@@ -124,3 +149,38 @@ def training_delete(request, pk):
     training.delete()
     messages.success(request, f'ลบหลักสูตร "{training.course_name}" เรียบร้อยแล้ว')
     return redirect('training_list')
+
+@login_required
+def training_edit(request, pk):
+    training = get_object_or_404(Training, pk=pk)
+
+    if request.method == 'POST':
+        form = TrainingForm(request.POST, request.FILES, instance=training)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'อัปเดตข้อมูลเรียบร้อยแล้ว')
+            return redirect('training_edit', pk=pk)  # กลับมาหน้าเดิม
+    else:
+        form = TrainingForm(instance=training)
+
+    # เดือนภาษาไทยแบบย่อ
+    months_th = [
+        "", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+        "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."
+    ]
+
+    # แปลงวันที่ของ training เพียงรายการเดียว
+    if training.date:
+        day = training.date.day
+        month = months_th[training.date.month]
+        year = training.date.year + 543
+        thai_date = f"{day} {month} {year}"
+    else:
+        thai_date = ""
+
+    return render(request, 'trainings/training_edit.html', {
+        'form': form,
+        'training': training,
+        'thai_date': thai_date,
+    })
+
